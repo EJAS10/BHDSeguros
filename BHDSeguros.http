@@ -1,0 +1,6 @@
+@BHDSeguros_HostAddress = http://localhost:5121
+
+GET {{BHDSeguros_HostAddress}}/SecureApplications/Get
+Accept: application/json
+
+###
