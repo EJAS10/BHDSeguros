@@ -2,6 +2,7 @@
 using BHDSeguros.Domain.Interfaces.Repository.Client;
 using BHDSeguros.Infrastructure.Context;
 using BHDSeguros.Infrastructure.Repository.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace BHDSeguros.Infrastructure.Repository.Client
 {
@@ -13,6 +14,15 @@ namespace BHDSeguros.Infrastructure.Repository.Client
             : base(dbcontext)
         {
             _context = dbcontext;
+        }
+
+        public List<ClientSecureEntitie> GetClientSecuresById(int id)
+        {
+            return _context.Set<ClientSecureEntitie>()               
+                .Include(x => x.ProductType)
+                .Include(x => x.SecurePlans)
+                    .ThenInclude(x => x.SecureCode)
+                .Where(x => x.ClientId.Equals(id)).ToList();
         }
 
         public void Create(ClientSecureEntitie entity)

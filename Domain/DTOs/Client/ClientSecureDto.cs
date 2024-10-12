@@ -8,6 +8,6 @@ namespace BHDSeguros.Domain.DTOs.Client
         public ClientDto Client { get; set; }
 
         public int SecurePlansId { get; set; }
-        public SecurePlansDto SecurePlans { get; set; }
+        public ClientSecurePlansDto SecurePlans { get; set; }
     }
 }

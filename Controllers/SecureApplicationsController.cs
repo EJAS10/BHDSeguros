@@ -1,5 +1,6 @@
 using BHDSeguros.Domain.DTOs.SecureApplications;
 using BHDSeguros.Domain.Interfaces.Services.SecureApplication;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.ObjectPool;
 
@@ -21,16 +22,22 @@ namespace BHDSeguros.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult CheckStatus()
         {
-            //return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            //{
-            //    Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            //    TemperatureC = Random.Shared.Next(-20, 55),
-            //    Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            //})
-            //.ToArray();
             return Ok("Ready");
+        }
+
+        [HttpGet]
+        public IActionResult Get(string Identification)
+        {
+            try
+            {
+                return Ok(_secureApplicationService.GetClientSecurePlans(Identification));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]

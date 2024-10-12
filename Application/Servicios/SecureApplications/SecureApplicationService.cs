@@ -7,7 +7,7 @@ using BHDSeguros.Domain.Helpers.Date;
 using BHDSeguros.Domain.Interfaces.Repository.Client;
 using BHDSeguros.Domain.Interfaces.Repository.SecureApplication;
 using BHDSeguros.Domain.Interfaces.Services.SecureApplication;
-using Facturacion.Infrastructure.Repository.SecureApplication;
+using BHDSeguros.Domain.Structs;
 
 namespace BHDSeguros.Application.Servicios.SecureApplications
 {
@@ -17,12 +17,11 @@ namespace BHDSeguros.Application.Servicios.SecureApplications
         private readonly IClientRepository _clientRepository;
         private readonly ISecurePlansRepository _securePlansRepository;
         private readonly IClientSecureRepository _clientSecureRepository;
-
-        private readonly IAllowedProductTypeRepository _allowedProductTypeRepository;
+        private readonly IProductTypeRepository _allowedProductTypeRepository;
         private readonly IMapper _mapper;
 
         public SecureApplicationService(IMapper mapper, ISecureApplicationRepository secureApplicationRepository, IClientRepository clientRepository,
-            ISecurePlansRepository securePlansRepository, IClientSecureRepository clientSecureRepository, IAllowedProductTypeRepository allowedProductTypeRepository)
+            ISecurePlansRepository securePlansRepository, IClientSecureRepository clientSecureRepository, IProductTypeRepository allowedProductTypeRepository)
         {
             _mapper = mapper;
             _secureApplicationRepository = secureApplicationRepository;
@@ -30,6 +29,18 @@ namespace BHDSeguros.Application.Servicios.SecureApplications
             _securePlansRepository = securePlansRepository;
             _clientSecureRepository = clientSecureRepository;
             _allowedProductTypeRepository = allowedProductTypeRepository;
+        }
+
+        public List<ClientSecurePlansDto> GetClientSecurePlans(string Identification)
+        {
+            List<ClientSecurePlansDto> Response = new List<ClientSecurePlansDto>();
+            var Client = _clientRepository.GetClientByIdentification(Identification, false);
+            if (Client != null) 
+            {
+                var ClientSecures = _clientSecureRepository.GetClientSecuresById(Client.Id);
+                Response = _mapper.Map<List<ClientSecurePlansDto>>(ClientSecures);
+            }
+            return Response;   
         }
 
         public string Create(SecureApplicationsDto secure)
@@ -43,10 +54,9 @@ namespace BHDSeguros.Application.Servicios.SecureApplications
                 return CreateClientSecure(Application);
         }
 
-
         private SecureApplicationsEntitie SetApplicationData(SecureApplicationsDto secureApplicationDto)
         {
-            var client = _clientRepository.getClientByIdentification(secureApplicationDto.ClientIdentification) ?? CreateClient(secureApplicationDto);
+            var client = _clientRepository.GetClientByIdentification(secureApplicationDto.ClientIdentification) ?? CreateClient(secureApplicationDto);
             var SecurePlan = GetSecurePlan(secureApplicationDto);
             bool IsValidApplication = true;
             var Application = new SecureApplicationsEntitie();
@@ -68,7 +78,7 @@ namespace BHDSeguros.Application.Servicios.SecureApplications
             int Age = DateHelper.CalcularEdad(client.DateOfBirth);
             if (Age < SecurePlan.MinAge || Age > SecurePlan.MaxAge)
             {
-                Application.Message += "El Cliente no tiene una edad valida para el plan";
+                Application.Message += ErrorMessagesStruct.INVALIDAGE;
                 Application.SolicitudStatus = SolicitudStatusEnum.Rechazado;
                 IsValidApplication = false;
             }
@@ -83,7 +93,7 @@ namespace BHDSeguros.Application.Servicios.SecureApplications
             {
                 if (client.ClientSecure.Any(x => x.SecurePlansId.Equals(SecurePlan.Id)))
                 {
-                    Application.Message += "El Cliente ya tiene este plan. ";
+                    Application.Message += ErrorMessagesStruct.CLIENTALREADYGOTTHISPLAN;
                     Application.SolicitudStatus = SolicitudStatusEnum.Rechazado;
                     IsValidApplication = false;
                 }
@@ -106,9 +116,9 @@ namespace BHDSeguros.Application.Servicios.SecureApplications
                 if (ProductType != null)
                     Application.ProductTypeId = ProductType.Id;
                 else
-                    throw new Exception("El tipo de producto no es valido");
+                    throw new Exception(ErrorMessagesStruct.INVALIDPRODUCTTYPE);
 
-                Application.Message += "El tipo de producto no es valido para el plan. ";
+                Application.Message += ErrorMessagesStruct.INVALIDPRODUCTTYPEFORPLAN;
                 Application.SolicitudStatus = SolicitudStatusEnum.Rechazado;
                 IsValidApplication = false;
             }
@@ -120,7 +130,7 @@ namespace BHDSeguros.Application.Servicios.SecureApplications
         {
             var SecurePlan = _securePlansRepository.GetByCode(secureApplicationDto.SecurePlan);
             if (SecurePlan == null)
-                throw new Exception("Tipo de seguro no existe");
+                throw new Exception(ErrorMessagesStruct.INVALIDSECURETYPE);
             return SecurePlan;
         }
 
@@ -136,6 +146,8 @@ namespace BHDSeguros.Application.Servicios.SecureApplications
             var clientSecureEntitie = new ClientSecureEntitie();
             clientSecureEntitie.ClientId = secureApplication.ClientId;
             clientSecureEntitie.SecurePlansId = secureApplication.SecurePlans.Id;
+            clientSecureEntitie.ProductNumber = secureApplication.ProductNumber;
+            clientSecureEntitie.ProductTypeId = secureApplication.ProductTypeId;
             clientSecureEntitie.Policy = GeneratePolicy(secureApplication);
             _clientSecureRepository.Create(clientSecureEntitie);
 
@@ -145,6 +157,6 @@ namespace BHDSeguros.Application.Servicios.SecureApplications
         private string GeneratePolicy(SecureApplicationsEntitie secure)
         {
             return $"{secure.SecurePlans.SecureCode.SecureCode}-{secure.SecurePlans.PlansCode}-{secure.Id.ToString().PadLeft(5, '0')}";
-        }
+        }      
     }
 }

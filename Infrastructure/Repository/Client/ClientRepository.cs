@@ -8,9 +8,9 @@ namespace BHDSeguros.Infrastructure.Repository.Client
 {
     public class ClientRepository : RepositoryBase<ClientEntitie, DataBaseContext>, IClientRepository
     {
-      
+
         private readonly DataBaseContext _context;
-        public ClientRepository(DataBaseContext dbcontext) 
+        public ClientRepository(DataBaseContext dbcontext)
             : base(dbcontext)
         {
             _context = dbcontext;
@@ -21,11 +21,13 @@ namespace BHDSeguros.Infrastructure.Repository.Client
             Insert(entity);
         }
 
-        public ClientEntitie? getClientByIdentification(string identification)
+        public ClientEntitie? GetClientByIdentification(string identification, bool LoadInclude = true)
         {
-            return _context.Set<ClientEntitie>()
-                .Include(x => x.ClientSecure)
-                .Where(x => x.ClientIdentification == identification).FirstOrDefault();
+            var query = _context.Set<ClientEntitie>().AsQueryable();
+            if (LoadInclude)
+                query.Include(x => x.ClientSecure);
+
+            return query.Where(x => x.ClientIdentification.Equals(identification)).FirstOrDefault();
         }
     }
 }

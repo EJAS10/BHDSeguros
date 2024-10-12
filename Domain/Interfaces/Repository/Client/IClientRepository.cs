@@ -6,6 +6,6 @@ namespace BHDSeguros.Domain.Interfaces.Repository.Client
     {
         void Create(ClientEntitie entity);
 
-        ClientEntitie? getClientByIdentification(string identification);
+        ClientEntitie? GetClientByIdentification(string identification, bool LoadInclude = true);
     }
 }

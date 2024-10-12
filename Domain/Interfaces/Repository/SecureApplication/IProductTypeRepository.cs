@@ -2,7 +2,7 @@
 
 namespace BHDSeguros.Domain.Interfaces.Repository.SecureApplication
 {
-    public interface IAllowedProductTypeRepository
+    public interface IProductTypeRepository
     {
         ProductTypeEntitie? GetByName(string Name);
     }

@@ -18,7 +18,7 @@ builder.Services.AddScoped<ISecureApplicationRepository, SecureApplicationReposi
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ISecurePlansRepository, SecurePlansRepository>();
 builder.Services.AddScoped<IClientSecureRepository, ClientSecureRepository>();
-builder.Services.AddScoped<IAllowedProductTypeRepository, AllowedProductTypeRepository>();
+builder.Services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
 builder.Services.AddScoped<ISecureApplicationService, SecureApplicationService>();
 
 

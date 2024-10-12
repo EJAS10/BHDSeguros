@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Facturacion.Infrastructure.Repository.SecureApplication
 {
-    public class AllowedProductTypeRepository : RepositoryBase<ProductTypeEntitie, DataBaseContext>, IAllowedProductTypeRepository
+    public class ProductTypeRepository : RepositoryBase<ProductTypeEntitie, DataBaseContext>, IProductTypeRepository
     {
 
         private readonly DataBaseContext _context;
-        public AllowedProductTypeRepository(DataBaseContext dbcontext)
+        public ProductTypeRepository(DataBaseContext dbcontext)
             : base(dbcontext)
         {
             _context = dbcontext;
@@ -19,7 +19,7 @@ namespace Facturacion.Infrastructure.Repository.SecureApplication
         public ProductTypeEntitie? GetByName(string Name)
         {
             return _context.Set<ProductTypeEntitie>()
-               .Where(x => x.ProductTypeName == Name).FirstOrDefault();
+               .Where(x => x.ProductTypeName.Equals(Name)).FirstOrDefault();
         }
     }
 }

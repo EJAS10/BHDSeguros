@@ -21,7 +21,7 @@ namespace Facturacion.Infrastructure.Repository.SecureApplication
                 .Include(x => x.SecureCode)
                 .Include(y => y.SecureCode.ProductType)
                 .ThenInclude(x => x.ProductType)
-                .Where(x => x.PlansCode == code).FirstOrDefault();
+                .Where(x => x.PlansCode.Equals(code)).FirstOrDefault();
         }
 
         public void Create(SecurePlansEntitie entity)

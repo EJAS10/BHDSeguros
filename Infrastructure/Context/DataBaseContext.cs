@@ -10,8 +10,8 @@ namespace BHDSeguros.Infrastructure.Context
             base(options)
         { }
 
-        public DbSet<ProductTypeEntitie> AllowedProductType { get; set; }
-        public DbSet<SecureCodeProductTypeEntitie> ProductTypeSecureCode { get; set; }
+        public DbSet<ProductTypeEntitie> ProductType { get; set; }
+        public DbSet<SecureCodeProductTypeEntitie> SecureCodeProductType { get; set; }
         public DbSet<ClientEntitie> Client { get; set; }
         public DbSet<ClientSecureEntitie> ClientSecure { get; set; }
         public DbSet<SecureApplicationsEntitie> SecureApplications { get; set; }
